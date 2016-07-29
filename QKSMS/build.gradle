@@ -27,17 +27,18 @@ android {
         disable 'InvalidPackage'
     }
 
-    compileSdkVersion 22
-    buildToolsVersion '23.0.2'
+    compileSdkVersion 24
+    buildToolsVersion '24.0.1'
 
     defaultConfig {
         versionCode 133
         versionName "2.7.1"
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 24
         multiDexEnabled true
     }
 
+    useLibrary 'org.apache.http.legacy'
     buildTypes {
         release {
             minifyEnabled true
@@ -104,9 +105,9 @@ dependencies {
 
     // Google libraries
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:support-v13:22.2.1'
-    compile 'com.android.support:recyclerview-v7:22.2.1'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:support-v13:24.1.1'
+    compile 'com.android.support:recyclerview-v7:24.1.1'
     withAnalyticsCompile 'com.google.android.gms:play-services-analytics:8.3.0'
 
     // External services
