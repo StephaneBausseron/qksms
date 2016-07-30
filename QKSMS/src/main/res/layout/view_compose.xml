@@ -78,11 +78,11 @@
             android:layout_marginBottom="-16dp"
             android:animateLayoutChanges="true">
 
-            <ImageView
+            <android.support.design.widget.FloatingActionButton
                 android:layout_width="56dp"
                 android:layout_height="64dp"
                 android:layout_gravity="center"
-                android:src="@drawable/fab_shadow_mini" />
+                />
 
             <ImageView
                 android:id="@+id/compose_button_background"

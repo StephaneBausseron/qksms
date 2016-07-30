@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.melnykov.fab.FloatingActionButton;
 import com.moez.QKSMS.R;
 import com.moez.QKSMS.common.BlockedConversationHelper;
 import com.moez.QKSMS.common.DialogHelper;
