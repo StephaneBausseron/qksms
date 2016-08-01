@@ -8,8 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ComponentInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -30,6 +32,7 @@ import com.moez.QKSMS.common.google.DraftCache;
 import com.moez.QKSMS.common.utils.MessageUtils;
 import com.moez.QKSMS.data.Conversation;
 import com.moez.QKSMS.enums.QKPreference;
+import com.moez.QKSMS.permission.PermissionManager;
 import com.moez.QKSMS.receiver.IconColorReceiver;
 import com.moez.QKSMS.service.DeleteOldMessagesService;
 import com.moez.QKSMS.transaction.NotificationManager;
@@ -80,6 +83,10 @@ public class MainActivity extends QKActivity {
         setContentView(R.layout.activity_fragment);
         setTitle(R.string.title_conversation_list);
         ButterKnife.bind(this);
+
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            return;
+        }
 
         FragmentManager fm = getFragmentManager();
         mConversationList = (ConversationListFragment) fm.findFragmentByTag(ConversationListFragment.TAG);
@@ -152,6 +159,10 @@ public class MainActivity extends QKActivity {
             return;
         }
 
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            return;
+        }
+
         Intent welcomeIntent = new Intent(this, WelcomeActivity.class);
         startActivityForResult(welcomeIntent, WelcomeActivity.WELCOME_REQUEST_CODE);
     }
@@ -162,7 +173,10 @@ public class MainActivity extends QKActivity {
         menu.clear();
 
         showBackButton(false);
-        mConversationList.inflateToolbar(menu, inflater, this);
+
+        if(PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            mConversationList.inflateToolbar(menu, inflater, this);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -213,10 +227,12 @@ public class MainActivity extends QKActivity {
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mConversationList.isShowingBlocked()) {
-                mConversationList.setShowingBlocked(false);
-            } else {
-                finish();
+            if(PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+                if (mConversationList.isShowingBlocked()) {
+                    mConversationList.setShowingBlocked(false);
+                } else {
+                    finish();
+                }
             }
         }
 
@@ -232,6 +248,12 @@ public class MainActivity extends QKActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            // Activity will be recreated after than all mandatory permissions will be granted
+            return;
+        }
+
+
         // Only mark screen if the screen is on. onStart() is still called if the app is in the
         // foreground and the screen is off
         // TODO this solution doesn't work if the activity is in the foreground but the lockscreen is on
@@ -246,9 +268,26 @@ public class MainActivity extends QKActivity {
     protected void onResume() {
         super.onResume();
 
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            // Activity will be recreated after than all mandatory permissions will be granted
+            return;
+        }
+
         sThreadShowing = 0;
 
         NotificationManager.initQuickCompose(this, false, false);
+    }
+
+    @Override
+    protected void onMissingMandatoryPermission() {
+        Snackbar.make(mRoot, "Missing permission", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Go to setting", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        PermissionManager.getInstance().showConfigurationPanelForDeniedMandatoryPermission(MainActivity.this);
+                    }
+                })
+                .show();
     }
 
     /**
@@ -269,6 +308,10 @@ public class MainActivity extends QKActivity {
         // onNewIntent doesn't change the result of getIntent() by default, so here we set it since
         // that makes the most sense.
         setIntent(intent);
+
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            return;
+        }
 
         boolean shouldOpenConversation = intent.hasExtra(MessageListActivity.ARG_THREAD_ID);
 

@@ -10,6 +10,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +32,7 @@ import com.moez.QKSMS.common.LiveViewManager;
 import com.moez.QKSMS.common.QKPreferences;
 import com.moez.QKSMS.common.utils.ColorUtils;
 import com.moez.QKSMS.enums.QKPreference;
+import com.moez.QKSMS.permission.PermissionManager;
 import com.moez.QKSMS.ui.ThemeManager;
 import com.moez.QKSMS.ui.settings.SettingsActivity;
 import com.moez.QKSMS.ui.view.QKTextView;
@@ -48,14 +51,21 @@ public abstract class QKActivity extends AppCompatActivity {
     protected Resources mRes;
     protected SharedPreferences mPrefs;
 
+    private boolean mustBeRecreatedOnAllMandatoryPermissionsGranted = false;
+
     private static boolean mStatusTintEnabled = true;
     private static boolean mNavigationTintEnabled = false;
 
     @Override
+    @CallSuper
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRes = getResources();
         getPrefs(); // set the preferences if they haven't been set. this method takes care of that logic for us
+
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            return;
+        }
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setIndeterminate(true);
@@ -70,6 +80,61 @@ public abstract class QKActivity extends AppCompatActivity {
             mNavigationTintEnabled = QKPreferences.getBoolean(QKPreference.TINTED_NAV) &&
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
         });
+    }
+
+    @Override
+    @CallSuper
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    @CallSuper
+    protected void onStart() {
+        super.onStart();
+        PermissionManager permissionManager = PermissionManager.getInstance();
+        permissionManager.refreshAllMandatoryPermissionsGranted(this);
+        if(!permissionManager.isAllMandatoryPermissionsAreGranted()) {
+            permissionManager.requestForMandatoryPermission(this);
+            mustBeRecreatedOnAllMandatoryPermissionsGranted = true;
+        }
+    }
+
+    @Override
+    @CallSuper
+    protected void onResume() {
+        super.onResume();
+        PermissionManager permissionManager = PermissionManager.getInstance();
+        permissionManager.refreshAllMandatoryPermissionsGranted(this);
+        if(!permissionManager.isAllMandatoryPermissionsAreGranted()) {
+            onMissingMandatoryPermission();
+        } else {
+            if(mustBeRecreatedOnAllMandatoryPermissionsGranted) {
+                recreate();
+                mustBeRecreatedOnAllMandatoryPermissionsGranted = false;
+            }
+        }
+
+    }
+
+    protected void onMissingMandatoryPermission() {
+        finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(permissions.length == 0) {
+            return;
+        }
+
+        PermissionManager permissionManager = PermissionManager.getInstance();
+        if(permissionManager.isAllMandatoryPermissionsAreGranted()) {
+            if(mustBeRecreatedOnAllMandatoryPermissionsGranted) {
+                recreate();
+                mustBeRecreatedOnAllMandatoryPermissionsGranted = false;
+            }
+        }
     }
 
     /**
