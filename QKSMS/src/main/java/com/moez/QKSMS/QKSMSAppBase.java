@@ -42,6 +42,7 @@ import com.moez.QKSMS.common.google.PduLoaderManager;
 import com.moez.QKSMS.common.google.ThumbnailManager;
 import com.moez.QKSMS.data.Contact;
 import com.moez.QKSMS.data.Conversation;
+import com.moez.QKSMS.permission.PermissionManager;
 import com.moez.QKSMS.transaction.NotificationManager;
 import com.moez.QKSMS.ui.ThemeManager;
 import com.moez.QKSMS.ui.mms.layout.LayoutManager;
@@ -94,6 +95,13 @@ public class QKSMSAppBase extends MultiDexApplication {
         registerActivityLifecycleCallbacks(new LifecycleHandler());
 
         ThemeManager.init(this);
+
+        PermissionManager.getInstance().refreshAllMandatoryPermissionsGranted(this);
+
+        init();
+    }
+
+    public void init() {
         MmsConfig.init(this);
         Contact.init(this);
         DraftCache.init(this);
@@ -125,7 +133,9 @@ public class QKSMSAppBase extends MultiDexApplication {
      */
     private void activePendingMessages() {
         // For Mms: try to process all pending transactions if possible
-        MmsSystemEventReceiver.wakeUpService(this);
+        if(PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            MmsSystemEventReceiver.wakeUpService(this);
+        }
 
         // For Sms: retry to send smses in outbox and queued box
         //sendBroadcast(new Intent(SmsReceiverService.ACTION_SEND_INACTIVE_MESSAGE, null, this, SmsReceiver.class));

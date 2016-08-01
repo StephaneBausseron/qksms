@@ -63,7 +63,12 @@ public class LayoutManager {
                 "Unsupported display type: " + displayType);
     }
 
+    private static boolean isInit = false;
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
         if (LOCAL_LOGV) {
             Log.v(TAG, "DefaultLayoutManager.init()");
         }
@@ -72,6 +77,8 @@ public class LayoutManager {
             Log.w(TAG, "Already initialized.");
         }
         sInstance = new LayoutManager(context);
+
+        isInit = true;
     }
 
     public static LayoutManager getInstance() {

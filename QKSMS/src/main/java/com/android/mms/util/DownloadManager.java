@@ -69,8 +69,15 @@ public class DownloadManager {
         return mAutoDownload;
     }
 
+    private static boolean isInit = false;
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
         sInstance = new DownloadManager(context);
+
+        isInit = true;
     }
 
     public static DownloadManager getInstance() {

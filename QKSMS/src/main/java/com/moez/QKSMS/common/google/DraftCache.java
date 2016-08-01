@@ -25,6 +25,7 @@ package com.moez.QKSMS.common.google;
  import android.util.Log;
 
  import com.moez.QKSMS.LogTag;
+ import com.moez.QKSMS.permission.PermissionManager;
 
  import java.util.HashSet;
  import java.util.Set;
@@ -231,11 +232,23 @@ public class DraftCache {
         }
     }
 
+     private static boolean isInit = false;
     /**
      * Initialize the global instance. Should call only once.
      */
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            // Init will be done after than all mandatory permissions granted
+            return;
+        }
+
+
         sInstance = new DraftCache(context);
+        isInit = true;
     }
 
     /**

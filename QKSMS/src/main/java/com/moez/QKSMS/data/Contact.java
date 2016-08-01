@@ -356,13 +356,17 @@ public class Contact {
         return mAvatar != null ? mAvatar : defaultValue;
     }
 
+    private static boolean isInit = false;
     public static void init(final Context context) {
+        RecipientIdCache.init(context);
+        if(isInit) {
+            return;
+        }
         if (sContactCache != null) { // Stop previous Runnable
             sContactCache.mTaskQueue.mWorkerThread.interrupt();
         }
         sContactCache = new ContactsCache(context);
 
-        RecipientIdCache.init(context);
 
         // it maybe too aggressive to listen for *any* contact changes, and rebuild MMS contact
         // cache each time that occurs. Unless we can get targeted updates for the contacts we
@@ -372,6 +376,8 @@ public class Contact {
         context.getContentResolver().registerContentObserver(
                 Contacts.CONTENT_URI, true, sContactsObserver);
         */
+
+        isInit = true;
     }
 
     public static void dump() {

@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.moez.QKSMS.LogTag;
+import com.moez.QKSMS.permission.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,13 +46,24 @@ public class RecipientIdCache {
         }
     }
 
+    private static boolean isInit = false;
     static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            // Init will be done after than all mandatory permissions granted
+            return;
+        }
         sInstance = new RecipientIdCache(context);
         new Thread(new Runnable() {
             public void run() {
                 fill();
             }
         }, "RecipientIdCache.init").start();
+
+        isInit = true;
     }
 
     RecipientIdCache(Context context) {

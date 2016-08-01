@@ -114,7 +114,11 @@ public class MmsConfig {
     // activity.
     private static boolean mEnableGroupMms = true;
 
+    private static boolean isInit = false;
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
         if (LOCAL_LOGV) {
             Log.v(TAG, "MmsConfig.init()");
         }
@@ -122,6 +126,7 @@ public class MmsConfig {
         //Log.v(TAG, "mnc/mcc: " + android.os.SystemProperties.get(TelephonyProperties.PROPERTY_ICC_OPERATOR_NUMERIC));
 
         loadMmsSettings(context);
+        isInit = true;
     }
 
     public static boolean isSmsEnabled(Context context) {

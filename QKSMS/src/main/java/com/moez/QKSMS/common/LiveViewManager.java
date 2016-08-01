@@ -43,18 +43,25 @@ public abstract class LiveViewManager {
             QKPreference.BACKGROUND.getKey()
     ));
 
+    private static boolean isInit = false;
     /**
      * Initialize preferences and register a listener for changes
      *
      * @param context Context
      */
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
             if (!sExcludedPrefs.contains(key)) {
                 refreshViews(key);
             }
         });
+
+        isInit = true;
     }
 
     /**

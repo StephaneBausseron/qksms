@@ -28,6 +28,7 @@ import com.moez.QKSMS.LogTag;
 import com.moez.QKSMS.QKSMSApp;
 import com.moez.QKSMS.R;
 import com.moez.QKSMS.common.google.DraftCache;
+import com.moez.QKSMS.permission.PermissionManager;
 import com.moez.QKSMS.receiver.UnreadBadgeService;
 import com.moez.QKSMS.common.utils.AddressUtils;
 import com.moez.QKSMS.common.utils.PhoneNumberUtils;
@@ -1089,11 +1090,21 @@ public class Conversation {
         }
     }
 
+    private static boolean isInit = false;
     /**
      * Set up the conversation cache.  To be called once at application
      * startup time.
      */
     public static void init(final Context context) {
+        if(isInit) {
+            return;
+        }
+
+        if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            // Init will be done after than all mandatory permissions granted
+            return;
+        }
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -1102,6 +1113,8 @@ public class Conversation {
         }, "Conversation.init");
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
+
+        isInit = true;
     }
 
     public static void markAllConversationsAsSeen(final Context context) {

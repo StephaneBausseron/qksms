@@ -71,13 +71,20 @@ public class RateController {
         mContext = context;
     }
 
+    private static boolean isInit = false;
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
         if (LOCAL_LOGV) Log.v(TAG, "RateController.init()");
 
         if (sInstance != null) {
             Log.w(TAG, "Already initialized.");
         }
         sInstance = new RateController(context);
+
+        isInit = true;
     }
 
     public static RateController getInstance() {

@@ -9,8 +9,15 @@ public abstract class QKPreferences {
 
     private static SharedPreferences sPrefs;
 
+    private static boolean isInit = false;
     public static void init(Context context) {
+        if(isInit) {
+            return;
+        }
+
         sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        isInit = true;
     }
 
     public static boolean getBoolean(QKPreference preference) {

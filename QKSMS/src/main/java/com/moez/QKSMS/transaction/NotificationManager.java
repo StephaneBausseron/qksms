@@ -81,7 +81,11 @@ public class NotificationManager {
         sHandler = new Handler(sLooper);
     }
 
+    private static boolean isInit = false;
     public static void init(final Context context) {
+        if(isInit) {
+            return;
+        }
 
         // Initialize the static shared prefs and resources.
         sPrefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -90,6 +94,8 @@ public class NotificationManager {
         // Listen for MMS events.
         IntentFilter filter = new IntentFilter(TransactionService.TRANSACTION_COMPLETED_ACTION);
         context.registerReceiver(sBroadcastReceiver, filter);
+
+        isInit = true;
     }
 
     private static BroadcastReceiver sBroadcastReceiver = new BroadcastReceiver() {
