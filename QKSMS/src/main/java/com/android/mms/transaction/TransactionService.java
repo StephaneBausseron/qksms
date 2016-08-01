@@ -30,6 +30,7 @@ import android.database.sqlite.SqliteWrapper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -586,9 +587,11 @@ public class TransactionService extends Service implements Observer {
             // cancel timer for renewal of lease
             mServiceHandler.removeMessages(EVENT_CONTINUE_MMS_CONNECTIVITY);
             if (mConnMgr != null) {
-                mConnMgr.stopUsingNetworkFeature(
-                        ConnectivityManager.TYPE_MOBILE,
-                        "enableMMS");
+                if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                    mConnMgr.stopUsingNetworkFeature(
+                            ConnectivityManager.TYPE_MOBILE,
+                            "enableMMS");
+                }
             }
         } finally {
             releaseWakeLock();
