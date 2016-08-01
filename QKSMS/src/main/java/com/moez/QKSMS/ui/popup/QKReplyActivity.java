@@ -1,14 +1,20 @@
 package com.moez.QKSMS.ui.popup;
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +27,7 @@ import com.moez.QKSMS.data.Conversation;
 import com.moez.QKSMS.data.ConversationLegacy;
 import com.moez.QKSMS.data.Message;
 import com.moez.QKSMS.interfaces.ActivityLauncher;
+import com.moez.QKSMS.permission.PermissionManager;
 import com.moez.QKSMS.service.CopyUnreadMessageTextService;
 import com.moez.QKSMS.service.DeleteUnreadMessageService;
 import com.moez.QKSMS.transaction.SmsHelper;
@@ -197,9 +204,7 @@ public class QKReplyActivity extends QKPopupActivity implements DialogInterface.
                 return true;
 
             case R.id.menu_call:
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:" + mConversationLegacy.getAddress()));
-                startActivity(callIntent);
+                call();
                 return true;
 
             case R.id.menu_mark_read:
@@ -229,6 +234,16 @@ public class QKReplyActivity extends QKPopupActivity implements DialogInterface.
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void call() {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, CALL_PHONE_PERMISSION_REQUEST);
+        } else {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse("tel:" + mConversationLegacy.getAddress()));
+            startActivity(callIntent);
+        }
     }
 
     @Override
@@ -302,5 +317,19 @@ public class QKReplyActivity extends QKPopupActivity implements DialogInterface.
         // 0 for the exit anim so that the dialog appears to not fade out while you're choosing an
         // attachment.
         overridePendingTransition(R.anim.abc_fade_in, 0);
+    }
+
+    private static final int CALL_PHONE_PERMISSION_REQUEST = 1001;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch(requestCode) {
+            case CALL_PHONE_PERMISSION_REQUEST:
+                if(permissions.length == 1 && Manifest.permission.CALL_PHONE.equals(permissions[0]) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    call();
+                }
+                break;
+        }
+        PermissionManager.getInstance().handleOnRequestPermissionsResult(this, requestCode, permissions, grantResults);
     }
 }

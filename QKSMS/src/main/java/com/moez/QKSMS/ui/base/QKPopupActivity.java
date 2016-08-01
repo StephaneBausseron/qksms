@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.moez.QKSMS.R;
+import com.moez.QKSMS.permission.PermissionManager;
 import com.moez.QKSMS.ui.ThemeManager;
 import com.moez.QKSMS.ui.settings.SettingsFragment;
 import com.moez.QKSMS.ui.view.QKLinearLayout;
@@ -22,6 +23,14 @@ public abstract class QKPopupActivity extends QKActivity {
     protected void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+        PermissionManager permissionManager = PermissionManager.getInstance();
+        permissionManager.refreshAllMandatoryPermissionsGranted(this);
+        if(!permissionManager.isAllMandatoryPermissionsAreGranted()) {
+            // No popup while all mandatory permissions are not granted
+            finish();
+            return;
+        }
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mRes = getResources();
