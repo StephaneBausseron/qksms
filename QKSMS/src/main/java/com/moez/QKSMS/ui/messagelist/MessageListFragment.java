@@ -206,6 +206,7 @@ public class MessageListFragment extends QKFragment implements ActivityLauncher,
         mAdapter.setItemClickListener(this);
         mAdapter.setMultiSelectListener(this);
         mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            private int itemCount = -1;
             @Override
             public void onChanged() {
                 LinearLayoutManager manager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
@@ -223,8 +224,11 @@ public class MessageListFragment extends QKFragment implements ActivityLauncher,
                     position = mAdapter.getItemCount() - 1;
                 }
 
-                if (position != -1) {
-                    manager.smoothScrollToPosition(mRecyclerView, null, position);
+                if(itemCount != mAdapter.getItemCount()) {
+                    if (position != -1) {
+                        manager.smoothScrollToPosition(mRecyclerView, null, position);
+                    }
+                    itemCount = mAdapter.getItemCount();
                 }
             }
         });
