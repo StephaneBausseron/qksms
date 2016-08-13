@@ -1,5 +1,6 @@
 package com.moez.QKSMS.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -43,6 +44,7 @@ import com.moez.QKSMS.ui.dialog.DefaultSmsHelper;
 import com.moez.QKSMS.ui.dialog.QKDialog;
 import com.moez.QKSMS.ui.dialog.mms.MMSSetupFragment;
 import com.moez.QKSMS.ui.messagelist.MessageListActivity;
+import com.moez.QKSMS.ui.permission.MissingPermissionActivity;
 import com.moez.QKSMS.ui.search.SearchActivity;
 import com.moez.QKSMS.ui.settings.SettingsFragment;
 import com.moez.QKSMS.ui.welcome.WelcomeActivity;
@@ -85,6 +87,10 @@ public class MainActivity extends QKActivity {
         ButterKnife.bind(this);
 
         if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+            launchMissingPermissionActivity();
+
+            // Does not fill UI when permissions are missing. When all permissions will be granted,
+            // activity will be recreated.
             return;
         }
 
@@ -167,6 +173,11 @@ public class MainActivity extends QKActivity {
         startActivityForResult(welcomeIntent, WelcomeActivity.WELCOME_REQUEST_CODE);
     }
 
+    private void launchMissingPermissionActivity() {
+        Intent missingPermissionIntent = new Intent(this, MissingPermissionActivity.class);
+        startActivityForResult(missingPermissionIntent, MissingPermissionActivity.MISSING_PERMISSION_REQUEST_CODE);
+    }
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -199,6 +210,13 @@ public class MainActivity extends QKActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == WelcomeActivity.WELCOME_REQUEST_CODE) {
             new DefaultSmsHelper(this, R.string.not_default_first).showIfNotDefault(null);
+        } else if(requestCode == MissingPermissionActivity.MISSING_PERMISSION_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_CANCELED || !PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
+                finish();
+            } else {
+                // Recreate the activity
+                recreate();
+            }
         }
     }
 
@@ -270,7 +288,7 @@ public class MainActivity extends QKActivity {
 
         if(!PermissionManager.getInstance().isAllMandatoryPermissionsAreGranted()) {
             // Activity will be recreated after than all mandatory permissions will be granted
-            return;
+            launchMissingPermissionActivity();
         }
 
         sThreadShowing = 0;

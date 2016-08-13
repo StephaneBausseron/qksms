@@ -106,9 +106,7 @@ public abstract class QKActivity extends AppCompatActivity {
         super.onResume();
         PermissionManager permissionManager = PermissionManager.getInstance();
         permissionManager.refreshAllMandatoryPermissionsGranted(this);
-        if(!permissionManager.isAllMandatoryPermissionsAreGranted()) {
-            onMissingMandatoryPermission();
-        } else {
+        if(permissionManager.isAllMandatoryPermissionsAreGranted()) {
             if(mustBeRecreatedOnAllMandatoryPermissionsGranted) {
                 recreate();
                 mustBeRecreatedOnAllMandatoryPermissionsGranted = false;
@@ -118,7 +116,7 @@ public abstract class QKActivity extends AppCompatActivity {
     }
 
     protected void onMissingMandatoryPermission() {
-        finish();
+
     }
 
     @Override
