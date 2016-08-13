@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/view_toolbar" />
+
+    <com.moez.QKSMS.ui.view.RobotoTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textSize="54sp"
+        android:textColor="@color/text_primary_dark"
+        android:text="Permissions"
+        app:typeface="roboto_thin" />
+
+    <com.moez.QKSMS.ui.view.RobotoTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:singleLine="false"
+        android:text="QKSMS needs some permissions in order to work. Please see why each permission is mandatory bellow."
+        android:textSize="18sp"
+        android:textColor="@color/text_primary_dark"
+        app:typeface="roboto_light" />
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/welcome_pager"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.moez.QKSMS.ui.view.RobotoTextView
+            android:id="@+id/missigin_permission_leave"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="36dp"
+            android:minWidth="88dp"
+            android:text="Leave QKSMS"
+            android:textColor="@color/text_primary_dark"
+            android:textSize="18sp" />
+
+        <com.moez.QKSMS.ui.view.RobotoTextView
+            android:id="@+id/missigin_permission_grant"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="36dp"
+            android:minWidth="88dp"
+            android:text="Grant access"
+            android:textColor="@color/text_primary_dark"
+            android:textSize="18sp" />
+    </LinearLayout>
+</LinearLayout>

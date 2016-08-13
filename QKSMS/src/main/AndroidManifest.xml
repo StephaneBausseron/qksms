@@ -368,6 +368,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppThemeLight" />
 
+        <activity
+            android:name=".ui.permission.MissingPermissionActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeLight" />
+
         <!-- Popup activity -->
         <activity
             android:name=".ui.popup.QKReplyActivity"
