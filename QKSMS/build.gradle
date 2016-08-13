@@ -36,6 +36,9 @@ android {
         minSdkVersion 15
         targetSdkVersion 24
         multiDexEnabled true
+        jackOptions {
+            enabled false
+        }
     }
 
     useLibrary 'org.apache.http.legacy'
