@@ -132,7 +132,6 @@ public class MessageListFragment extends QKFragment implements ActivityLauncher,
     // If the value >= 0, then we jump to that line. If the
     // value is maxint, then we jump to the end.
 
-    private long mLastMessageId;
     private BackgroundQueryHandler mBackgroundQueryHandler;
 
     private long mThreadId;
@@ -940,10 +939,6 @@ public class MessageListFragment extends QKFragment implements ActivityLauncher,
                     mConversation.setMessageCount(0);
                     // fall through
                 case DELETE_MESSAGE_TOKEN:
-                    if (cookie instanceof Boolean && ((Boolean) cookie).booleanValue()) {
-                        // If we just deleted the last message, reset the saved id.
-                        mLastMessageId = 0;
-                    }
 
                     // Update the notification for new messages since they may be deleted.
                     NotificationManager.update(mContext);
